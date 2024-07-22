@@ -30,7 +30,7 @@ def extraction(stem_file_path, **kwargs):
 
     """
 
-    json_file_path  = "stems/" + stem_file_path + ".json"
+    json_file_path  = os.path.splitext(stem_file_path)[0] + ".json"
 
     if not os.path.exists(json_file_path):
 
@@ -79,7 +79,7 @@ def get_tempo(stem_path):
         tempo = float(tempo[0])
 
     except FileNotFoundError as e:
-        print(f"File not found: {file_path}")
+        print(f"File not found: {stem_path}")
     except Exception as e:
         print(f"Unexpected error: {e}")
 

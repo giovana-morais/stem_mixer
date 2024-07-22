@@ -125,7 +125,9 @@ def automatic_preprocessing(data_home):
                     args.key = None
                     args.sound_class = None
 
-                metadata.extraction(stem_name, **kwargs)
+                print("we are performing metadata extraction on: ", file_path)
+
+                metadata.extraction(file_path, **kwargs)
 
 def manual_preprocessing(data_home, stem_name, new_tempo, new_instrument_name, new_key, new_sound_class):
     # at this point, assuming json already made
@@ -160,7 +162,7 @@ if __name__ == "__main__":
     kwargs = vars(args)
 
     automatic_preprocessing(args.data_home)
-    manual_preprocessing(args.data_home, "[0119] S1-PD4-05-CA", 123, "test1", "test2", "test3")
+    #manual_preprocessing(args.data_home, "[0119] S1-PD4-05-CA", 123, "test1", "test2", "test3")
 
 
 
