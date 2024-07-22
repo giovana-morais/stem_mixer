@@ -13,9 +13,12 @@ DEFAULT_SR = 22050
 def precheck(data_home, n_stems, n_harmonic, n_percussive):
 
 	# this only needs to run once
+	n_harmonic = int(n_harmonic)
+	n_percussive = int(n_percussive)
+	n_stems = int(n_stems)
 
 	# first check to make sure user has not provided n_harm and n_perc such that n_harm + n_perc != n_total
-	if (n_harmonic + n_percussive) != n_stems:
+	if n_harmonic + n_percussive != n_stems:
 		n_harmonic = 0
 		n_percussive = 0
 
@@ -66,11 +69,12 @@ def precheck(data_home, n_stems, n_harmonic, n_percussive):
 
 				# NEXT STEP IS TO MAKE THIS A DICTIONARY W ALL RELEVANT INFORMATION TO SELECT STEMS
 
-
 	return n_harmonic, n_percussive, tempo_bin_harmonic, tempo_bin_percussive
 
 def select_tracks(data_home, n_stems, n_harmonic, n_percussive, tempo_bin_harmonic, tempo_bin_percussive, invalid_mixture):
 
+	if invalid_mixture:
+		print("invalid")
 
 	try:
 
@@ -119,7 +123,9 @@ def select_tracks(data_home, n_stems, n_harmonic, n_percussive, tempo_bin_harmon
 			instrument = selected_stems.get(stem)[1]
 			list_of_instruments.append(instrument)
 
-		if len(list_of_instruments) != len(set(list_of_instruments)): # repeated instrument
+		# want list of instruments with no None values to make sure no repition where there are instruments filled in
+		filtered_instruments = [instr for instr in list_of_instruments if instr is not None]	
+		if len(filtered_instruments) != len(set(filtered_instruments)): # repeated instrument
 			invalid_mixture = True
 
 		if len(selected_stems) != n_stems:
@@ -132,6 +138,9 @@ def select_tracks(data_home, n_stems, n_harmonic, n_percussive, tempo_bin_harmon
 
 
 def stretch(data_home, n_stems, selected_stems, base_tempo, invalid_mixture):
+
+	if invalid_mixture:
+		print("invalid")
 
 	audio_files = glob.glob(os.path.join(data_home, "*.wav")) + glob.glob(os.path.join(data_home, "*.mp3"))
 	stretched_audios = []
@@ -199,6 +208,8 @@ def shift(stretched_audios, invalid_mixture):
 	return final_audios, invalid_mixture
 
 def generate(data_home, duration, invalid_mixture, stretched_audios):
+	if invalid_mixture:
+		print("invalid")
 
 	mixture_folder = os.path.join(data_home, "..", "mixtures")
 	os.makedirs(mixture_folder, exist_ok = True)
@@ -240,14 +251,14 @@ def generate(data_home, duration, invalid_mixture, stretched_audios):
 
 
 		for k in range(0, len(truncated_stems)):
-			sf.write(f"{individual_output_folder}/stem{k+1}.wav", truncated_stems[k], sr)
+			sf.write(f"{individual_output_folder}/stem{k+1}.wav", truncated_stems[k], DEFAULT_SR)
 
 
 		sf.write(f"{individual_output_folder}/mixture.wav", mixture_audio, DEFAULT_SR)
 
 	return invalid_mixture
 
-def mixture(data_home, n_mixtures, n_stems, n_harmonic, n_percussive):
+def mixture(data_home, n_mixtures, n_stems, n_harmonic, n_percussive, duration):
 
 	n_harmonic, n_percussive, tempo_bin_harmonic, tempo_bin_percussive = precheck(data_home, n_stems, n_harmonic, n_percussive)
 
@@ -256,21 +267,16 @@ def mixture(data_home, n_mixtures, n_stems, n_harmonic, n_percussive):
 		invalid_mixture = False
 
 		selected_stems, base_tempo, invalid_mixture = select_tracks(data_home, n_stems, n_harmonic, n_percussive, tempo_bin_harmonic, tempo_bin_percussive, invalid_mixture)
+		if invalid_mixture:
+			continue
 		stretched_audios, invalid_mixture = stretch(data_home, n_stems, selected_stems, base_tempo, invalid_mixture)
+		if invalid_mixture:
+			continue
 		final_audios, invalid_mixture = shift(stretched_audios, invalid_mixture)
+		if invalid_mixture:
+			continue
 
+		invalid_mixture = generate(data_home, duration, invalid_mixture, stretched_audios)
 		if not invalid_mixture:
-			invalid_mixture = generate(data_home, duration, invalid_mixture, stretched_audios)
-			if not invalid_mixture:
-				count += 1
-
-		else:
-			print("invalid mixture")
-
-
-
-
-
-
-
+			count += 1
 

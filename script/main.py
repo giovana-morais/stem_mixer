@@ -22,5 +22,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
     kwargs = vars(args)
 
-    mix.mixture(args.data_home, args.n_mixtures, args.n_stems, args.n_harmonic, args.n_percussive)
+    mix.mixture(args.data_home, args.n_mixtures, args.n_stems, args.n_harmonic, args.n_percussive, args.duration)
 
