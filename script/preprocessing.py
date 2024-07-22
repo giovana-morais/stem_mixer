@@ -1,4 +1,5 @@
 import argparse
+import json
 import os
 
 import metadata
@@ -94,25 +95,10 @@ def musdb(file_path):
 
     return tempo, instrument_name, key, sound_class
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-            prog="PreprocessingHelper",
-            description="This script creates metadata for BRID and/or MUSDB"
-            )
+def automatic_preprocessing(data_home):
 
-    # arguments. required --> data home, dataset (if using preprocessing)
-    parser.add_argument("--data_home", required=True, help="pathway to where is data is stored")
-    parser.add_argument("--dataset", required=True, choices=["brid","musdb"], help="supported datasets: BRID (enter 'brid') and MUSDB (enter 'musdb')")
-    parser.add_argument("--track_files", help="txt file with track names")
-    # need to develop this still
-
-    args = parser.parse_args()
-    kwargs = vars(args)
-
-    preprocessing_functions = {
-        "brid" : brid,
-        "musdb" : musdb
-    }
+    # determines if a file pertains to a specific dataset
+    # creates metadata json for each file
 
     path_to_brid = os.path.join(args.data_home, "..", "script", "brid.txt")
     path_to_musdb = os.path.join(args.data_home, "..", "script", "musdb.txt")
@@ -140,4 +126,41 @@ if __name__ == "__main__":
                     args.sound_class = None
 
                 metadata.extraction(stem_name, **kwargs)
+
+def manual_preprocessing(data_home, stem_name, new_tempo, new_instrument_name, new_key, new_sound_class):
+    # at this point, assuming json already made
+    # set up example call of this
+
+    json_file = stem_name + ".json"
+    path_to_json = os.path.join(data_home, json_file)
+
+    metadata = kwargs.copy()
+
+    with open(path_to_json, "r") as json_file:
+        metadata = json.load(json_file)
+
+    metadata["tempo"] = new_tempo
+    metadata["instrument_name"] = new_instrument_name
+    metadata["key"] = new_key
+    metadata["sound_class"] = new_sound_class
+
+    with open(path_to_json, "w") as json_file:
+        json.dump(metadata, json_file, indent=4)
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+            prog="PreprocessingHelper",
+            description="This script creates metadata for BRID and/or MUSDB"
+            )
+
+    # arguments. required --> data home, dataset (if using preprocessing)
+    parser.add_argument("--data_home", required=True, help="pathway to where is data is stored")
+
+    args = parser.parse_args()
+    kwargs = vars(args)
+
+    automatic_preprocessing(args.data_home)
+    manual_preprocessing(args.data_home, "[0119] S1-PD4-05-CA", 123, "test1", "test2", "test3")
+
+
 
