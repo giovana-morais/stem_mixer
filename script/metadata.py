@@ -34,6 +34,8 @@ def extraction(stem_path, track_metadata=None, overwrite=False):
             Path to the audio stem file.
         metadata: dict (optional)
             dictionary with pre-computed metadata
+        overwrite: boolean
+            if True, overwrite a JSON file that already exists
 
     Returns:
         None
@@ -44,7 +46,7 @@ def extraction(stem_path, track_metadata=None, overwrite=False):
     if track_metadata is None:
         track_metadata = dict_template()
 
-    if not os.path.exists(json_file_path) and not overwrite:
+    if not os.path.exists(json_file_path) or overwrite:
         metadata = track_metadata.copy()
 
         if metadata["tempo"] is None:
