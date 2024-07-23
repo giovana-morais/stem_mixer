@@ -1,3 +1,4 @@
+import os
 import glob
 import json
 import os
@@ -160,22 +161,24 @@ def stretch(data_home, n_stems, selected_stems, base_tempo, invalid_mixture):
 			audio, sr = librosa.load(wav_file, sr=DEFAULT_SR)
 			audio_norm = librosa.util.normalize(audio)
 
-			new_rate = float(target_tempo / current_tempo)
-			stretched_audio = librosa.effects.time_stretch(audio_norm, rate = new_rate)
+            audio, sr = librosa.load(wav_file, sr=sr)
+            audio_norm = librosa.util.normalize(audio)
 
-			stretched_audios.append(stretched_audio)
+            new_rate = float(target_tempo / current_tempo)
+            stretched_audio = librosa.effects.time_stretch(audio_norm, rate=new_rate)
 
 	if len(stretched_audios) != n_stems:
 		invalid_mixture = True
 
-	return stretched_audios, invalid_mixture
+    return stretched_audios, invalid_mixture
 
 def shift(stretched_audios, invalid_mixture): 
 
 	print("lengths", len(stretched_audios))
 
-	first_downbeats = []
-	final_audios = []
+def shift(sr, stretched_audios, invalid_mixture):
+    first_downbeats = []
+    final_audios = []
 
 	for audio in stretched_audios:
 		_, beat_times = librosa.beat.beat_track(y=audio, sr=DEFAULT_SR)
@@ -185,9 +188,9 @@ def shift(stretched_audios, invalid_mixture):
 	latest_beat = max(first_downbeats)
 	latest_beat_index = first_downbeats.index(latest_beat)
 
-	immutable_audio = stretched_audios[latest_beat_index]
+    immutable_audio = stretched_audios[latest_beat_index]
 
-	final_audios.append(immutable_audio)
+    final_audios.append(immutable_audio)
 
 	for i in range(0, len(stretched_audios)):
 		if i != latest_beat_index:
@@ -195,7 +198,8 @@ def shift(stretched_audios, invalid_mixture):
 			silence_samples = int(shift_difference * DEFAULT_SR)
 			silence = np.zeros(silence_samples)
 
-			final_audio = np.concatenate([silence, stretched_audios[i]])
+            final_audio = np.concatenate([silence, stretched_audios[i]])
+
 
 			# rechecking downbeats after shift
 			print("rechecking downbeat alignment")
@@ -203,7 +207,7 @@ def shift(stretched_audios, invalid_mixture):
 			downbeat_times = librosa.frames_to_time(beat_times, sr=DEFAULT_SR)
 			print(downbeat_times[0])
 
-			final_audios.append(final_audio)
+            final_audios.append(final_audio)
 
 	return final_audios, invalid_mixture
 
@@ -279,4 +283,3 @@ def mixture(data_home, n_mixtures, n_stems, n_harmonic, n_percussive, duration):
 		invalid_mixture = generate(data_home, duration, invalid_mixture, stretched_audios)
 		if not invalid_mixture:
 			count += 1
-
