@@ -436,9 +436,6 @@ def generate_mixtures(data_home, n_mixtures, n_stems, n_harmonic, n_percussive, 
 
     count = 0
     while count < n_mixtures:
-
-        print("")
-
         selected_stems, base_tempo, invalid_mixture = select_tracks(data_home, n_stems, n_harmonic, n_percussive, tempo_bin_harmonic, tempo_bin_percussive)
         if invalid_mixture:
             continue
