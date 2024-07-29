@@ -45,10 +45,6 @@ def organize_files(data_home, n_stems, n_harmonic, n_percussive):
 
     # first check to make sure user has not provided n_harm and n_perc such that n_harm + n_perc != n_total
     if n_harmonic + n_percussive != n_stems:
-        n_harmonic = 0
-        n_percussive = 0
-
-    if n_harmonic == 0 and n_percussive == 0: # if default provided, ensuring n_harm and n_perc values are set
         n_harmonic = n_stems // 2
         n_percussive = n_stems - n_harmonic
 
