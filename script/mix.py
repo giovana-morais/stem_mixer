@@ -451,9 +451,7 @@ def generate_mixtures(data_home, n_mixtures, n_stems, n_harmonic, n_percussive, 
 
         concatenate(data_home, duration, final_audios)
 
-        print("")
-        print("sending valid mixture to folder ...")
-        print("")
+        print("sending valid mixture to folder ...\n")
 
         count += 1
 
