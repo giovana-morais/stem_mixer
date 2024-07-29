@@ -5,7 +5,7 @@ import os
 import librosa
 import numpy as np
 
-DEFAULT_SR = 22050
+DEFAULT_SR = 44100
 
 
 # is it better to have a class?

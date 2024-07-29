@@ -9,7 +9,7 @@ import librosa
 import numpy as np
 import soundfile as sf
 
-DEFAULT_SR = 22050
+DEFAULT_SR = 44100
 
 def organize_files(data_home, n_stems, n_harmonic, n_percussive):
 
@@ -44,9 +44,11 @@ def organize_files(data_home, n_stems, n_harmonic, n_percussive):
     """
 
     # casting to integer
+    """
     n_harmonic = int(n_harmonic)
     n_percussive = int(n_percussive)
     n_stems = int(n_stems)
+    """
 
     # first check to make sure user has not provided n_harm and n_perc such that n_harm + n_perc != n_total
     if n_harmonic + n_percussive != n_stems:
@@ -101,6 +103,10 @@ def organize_files(data_home, n_stems, n_harmonic, n_percussive):
                         "key" : key
                         }
 
+    print("tempo bin harmonic ", tempo_bin_harmonic[100])
+    print("tempo bin percussive ", tempo_bin_percussive)
+
+
     return n_harmonic, n_percussive, tempo_bin_harmonic, tempo_bin_percussive
 
 def select_tracks(data_home, n_stems, n_harmonic, n_percussive, tempo_bin_harmonic, tempo_bin_percussive):
@@ -135,7 +141,7 @@ def select_tracks(data_home, n_stems, n_harmonic, n_percussive, tempo_bin_harmon
 
     """
 
-    n_stems = int(n_stems)
+    #n_stems = int(n_stems)
 
     # taking invalid mixture as parameter, initialized as False with each iteration and passed as parameter
 
@@ -240,7 +246,7 @@ def stretch(data_home, n_stems, selected_stems, base_tempo):
     invalid_mixture(bool): check of mixture validity
     """
 
-    n_stems = int(n_stems)
+    #n_stems = int(n_stems)
     invalid_mixture = False
 
     audio_files = glob.glob(os.path.join(data_home, "*.wav")) + glob.glob(os.path.join(data_home, "*.mp3"))
@@ -305,34 +311,38 @@ def shift(stretched_audios):
     final_audios = []
     invalid_mixture = False
 
-    for audio in stretched_audios:
-        _, beat_times = librosa.beat.beat_track(y=audio, sr=DEFAULT_SR)
-        downbeat_times = librosa.frames_to_time(beat_times, sr=DEFAULT_SR)
-        first_downbeats.append(downbeat_times[0])
+    try:
 
-    latest_beat = max(first_downbeats)
-    latest_beat_index = first_downbeats.index(latest_beat)
-
-    fixed_audio = stretched_audios[latest_beat_index]
-
-    final_audios.append(fixed_audio)
-
-    for i in range(0, len(stretched_audios)):
-        if i != latest_beat_index:
-            shift_difference = np.abs(first_downbeats[i] - latest_beat)
-            silence_samples = int(shift_difference * DEFAULT_SR)
-            silence = np.zeros(silence_samples)
-
-            final_audio = np.concatenate([silence, stretched_audios[i]])
-
-
-            # rechecking downbeats after shift
-            print("rechecking downbeat alignment")
-            _, beat_times = librosa.beat.beat_track(y=final_audio, sr=DEFAULT_SR)
+        for audio in stretched_audios:
+            _, beat_times = librosa.beat.beat_track(y=audio, sr=DEFAULT_SR)
             downbeat_times = librosa.frames_to_time(beat_times, sr=DEFAULT_SR)
-            print(downbeat_times[0])
+            first_downbeats.append(downbeat_times[0])
 
-            final_audios.append(final_audio)
+        latest_beat = max(first_downbeats)
+        latest_beat_index = first_downbeats.index(latest_beat)
+
+        fixed_audio = stretched_audios[latest_beat_index]
+
+        final_audios.append(fixed_audio)
+
+        for i in range(0, len(stretched_audios)):
+            if i != latest_beat_index:
+                shift_difference = np.abs(first_downbeats[i] - latest_beat)
+                silence_samples = int(shift_difference * DEFAULT_SR)
+                silence = np.zeros(silence_samples)
+
+                final_audio = np.concatenate([silence, stretched_audios[i]])
+
+
+                # rechecking downbeats after shift
+                print("rechecking downbeat alignment")
+                _, beat_times = librosa.beat.beat_track(y=final_audio, sr=DEFAULT_SR)
+                downbeat_times = librosa.frames_to_time(beat_times, sr=DEFAULT_SR)
+                print(downbeat_times[0])
+
+                final_audios.append(final_audio)
+    except:
+        invalid_mixture=True
 
     return final_audios, invalid_mixture
 
@@ -438,15 +448,19 @@ def generate_mixtures(data_home, n_mixtures, n_stems, n_harmonic, n_percussive, 
     while count < n_mixtures:
 
         print("")
+        print("trying to fetch a mixture")
 
         selected_stems, base_tempo, invalid_mixture = select_tracks(data_home, n_stems, n_harmonic, n_percussive, tempo_bin_harmonic, tempo_bin_percussive)
         if invalid_mixture:
+            print("invalid")
             continue
         stretched_audios, invalid_mixture = stretch(data_home, n_stems, selected_stems, base_tempo)
         if invalid_mixture:
+            print("invalid")
             continue
         final_audios, invalid_mixture = shift(stretched_audios)
         if invalid_mixture:
+            print("invalid")
             continue
 
         concatenate(data_home, duration, final_audios)
@@ -474,19 +488,23 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--n_mixtures", required=False, default=5, help="number of mixtures created"
+        "--n_mixtures", required=False, default=5, help="number of mixtures created",
+        type=int
     )
     parser.add_argument(
         "--n_stems",
         required=False,
         default=3,
         help="number of stems pertaining to each mix",
+        type=int
     )
     parser.add_argument(
-        "--n_harmonic", required=False, default=0, help="number of harmonic stems"
+        "--n_harmonic", required=False, default=0, help="number of harmonic stems", 
+        type=int
     )
     parser.add_argument(
-        "--n_percussive", required=False, default=0, help="number of percussive stems"
+        "--n_percussive", required=False, default=0, help="number of percussive stems", 
+        type=int
     )
 
     args = parser.parse_args()
