@@ -39,16 +39,9 @@ def organize_files(data_home, n_stems, n_harmonic, n_percussive):
     n_percussive(int): number of percussive stems (same as input if no changes needed to be applied)
     tempo_bin_harmonic(dict): dictionary to store tempo groupings of harmonic stems w/ metadata
     tempo_bin_percussive(dict): dictionary to store tempo groupings of percussive stems w/ metadata
-
-
     """
 
-    # casting to integer
-    """
-    n_harmonic = int(n_harmonic)
-    n_percussive = int(n_percussive)
-    n_stems = int(n_stems)
-    """
+
 
     # first check to make sure user has not provided n_harm and n_perc such that n_harm + n_perc != n_total
     if n_harmonic + n_percussive != n_stems:
@@ -140,8 +133,6 @@ def select_tracks(data_home, n_stems, n_harmonic, n_percussive, tempo_bin_harmon
     invalid_mixture(bool): a check to see if mixture is still valid
 
     """
-
-    #n_stems = int(n_stems)
 
     # taking invalid mixture as parameter, initialized as False with each iteration and passed as parameter
 
@@ -246,7 +237,6 @@ def stretch(data_home, n_stems, selected_stems, base_tempo):
     invalid_mixture(bool): check of mixture validity
     """
 
-    #n_stems = int(n_stems)
     invalid_mixture = False
 
     audio_files = glob.glob(os.path.join(data_home, "*.wav")) + glob.glob(os.path.join(data_home, "*.mp3"))
