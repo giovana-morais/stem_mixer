@@ -2,38 +2,16 @@ import pytest
 import json
 import os
 
-print("current directory: ", os.getcwd())
-
-from preprocessing import brid_track_info, musdb_track_info, stems_from_file, musdb, brid
+from preprocessing import brid_track_info, musdb_track_info, stems_from_file
 import metadata
+
+BRID_INDEX = "brid_index.txt"
+MUSDB_INDEX = "musdb_index.txt"
 
 
 @pytest.fixture
 def data_home():
     return "/test/path"
-
-@pytest.fixture
-def brid_expected_metadata():
-    return {
-        "stem_name": "1234 MX-PD-SA.wav",
-        "data_home": "/test/path",
-        "tempo": 80.0,
-        "key": None,
-        "sound_class": "percussive",
-        "instrument_name": "pandeiro"
-    }
-
-
-@pytest.fixture
-def musdb_expected_metadata():
-    return {
-        "stem_name": "Artist - Track - drums.wav",
-        "data_home": "/test/path",
-        "tempo": None,
-        "key": None,
-        "sound_class": "percussive",
-        "instrument_name": "drums"
-    }
 
 
 @pytest.mark.parametrize("tid, expected_metadata", [
@@ -63,9 +41,11 @@ def musdb_expected_metadata():
     })
 ])
 
+
 def test_brid_track_info(data_home, tid, expected_metadata):
     result = brid_track_info(data_home, tid)
     assert result == expected_metadata
+
 
 @pytest.mark.parametrize("tid, expected_metadata", [
     ("Artist - Track - drums.wav", {
@@ -102,6 +82,18 @@ def test_brid_track_info(data_home, tid, expected_metadata):
     })
 ])
 
+
 def test_musdb_track_info(data_home, tid, expected_metadata):
     result = musdb_track_info(data_home, tid)
     assert result == expected_metadata
+
+
+@pytest.mark.parametrize("file_path", 
+    [BRID_INDEX, MUSDB_INDEX])
+
+def test_stems_from_file(file_path):
+    with open(file_path, 'r') as f:
+        expected_stems = f.read().splitlines()
+    result = stems_from_file(file_path)
+    assert result == expected_stems
+
