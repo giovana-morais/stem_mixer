@@ -93,7 +93,7 @@ def save_stem_dataframe(data_home, index_file="index.csv"):
         # print(f)
 
     df = pd.DataFrame.from_dict(data)
-    df.to_csv(os.path.join(data_home, index_file), header=False)
+    df.to_csv(os.path.join(data_home, index_file), index=False)
 
     return df
 
