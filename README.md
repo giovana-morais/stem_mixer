@@ -59,6 +59,25 @@ to see other variables available, please run
 
 `python script/main.py --help`
 
+# example usage - tests
+
+first make sure `pytest` is installed:
+```bash
+pip install pytest
+```
+
+if you would like to run our implemented tests of the metadata module, first navigate to your `script` folder and then do the following:
+
+```bash
+pytest ../tests/test_md.py
+```
+
+if you would like to run our implemented tests of the preprocessing module, first navigate to your `script` folder and then do the following:
+
+```bash
+pytest ../tests/test_pre.py
+```
+
 # folder structure
 we expect the following folder structure:
 
