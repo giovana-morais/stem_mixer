@@ -135,6 +135,8 @@ def musdb_track_info(data_home, tid):
 
     track_metadata["sound_class"] = sound_class
 
+    print("TRACK METADATA: ", track_metadata)
+
     return track_metadata
 
 
