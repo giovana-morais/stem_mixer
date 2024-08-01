@@ -22,6 +22,26 @@ python script/preprocessing.py
 --data_home=<path_to_stems>
 ```
 
+if you want to manually call the `extraction` function to overwrite metadata:
+
+```python
+from metadata import extraction
+
+# define the path to your audio stem file
+stem_path = "path/to/your/stem/file.wav"
+
+# optionally, provide pre-computed metadata
+metadata = {
+    "stem_name": stem_name,
+    "data_home": data_home,
+    "tempo": tempo,
+    "key": key,
+    "sound_class": sound_class,
+}
+
+extraction(stem_path, track_metadata=metadata, overwrite=True)
+```
+
 to see other variables available, please run
 
 `python script/main.py --help`
