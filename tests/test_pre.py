@@ -95,4 +95,3 @@ def test_stems_from_file(file_path):
         expected_stems = f.read().splitlines()
     result = stems_from_file(file_path)
     assert result == expected_stems
-
