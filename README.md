@@ -36,7 +36,7 @@ metadata = {
     "data_home": data_home,
     "tempo": tempo,
     "key": key,
-    "sound_class": sound_class,
+    "sound_class": sound_class
 }
 
 extraction(stem_path, track_metadata=metadata, overwrite=True)
