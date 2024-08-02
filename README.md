@@ -6,8 +6,8 @@ This package aims to increase the diversity of instruments in mixtures used to t
 # example usage - metadata creation
 
 SUPPORTED DATASETS FOR NON-INFERRAL METADATA CREATION:
-- BRID (Brazilian Rhythmic Instruments Dataset)
-- MUSDB18* 
+- [BRID (Brazilian Rhythmic Instruments Dataset)](https://www.researchgate.net/publication/331589840_A_Novel_Dataset_of_Brazilian_Rhythmic_Instruments_and_Some_Experiments_in_Computational_Rhythm_Analysis)
+- [MUSDB18*](https://sigsep.github.io/datasets/musdb.html) 
 
 *note: if using MUSDB18, pre-pre-processing step required --> 
 - must save each stem with "vocals", "drums", "bass", "other" as prefix in .wav filename
