@@ -9,7 +9,8 @@ from metadata import get_sound_class
     "stem_path, expected_sc", 
     [
         ("../tests/Music Delta - Rockabilly-other.wav", "harmonic"), 
-        ("../tests/[0257] S2-SK2-01-SA.wav", "percussive")
+        ("../tests/[0257] S2-SK2-01-SA.wav", "percussive"),
+        ("../tests/56138__guitarmaster__a7th_108bpm.wav", "harmonic")
     ]
 )
 
