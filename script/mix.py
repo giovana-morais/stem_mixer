@@ -118,50 +118,37 @@ def shift(stems):
 
     Parameters
     ----------
-
-    stretched_audios(list): list of stretched audios
+    stems : list(dict)
+        stems with their respective metadata
 
     Returns
     -------
     final_audios(list): list of shifted audios
-    invalid_mixture(bool): check of mixture validity
-
     """
 
-    first_downbeats = []
+    first_beats = []
     final_audios = []
-    invalid_mixture = False
 
-    try:
-        for audio in stretched_audios:
-            _, beat_times = librosa.beat.beat_track(y=audio, sr=DEFAULT_SR)
-            downbeat_times = librosa.frames_to_time(beat_times, sr=DEFAULT_SR)
-            first_downbeats.append(downbeat_times[0])
+    for s in stems:
+        _, beat_frames = librosa.beat.beat_track(y=s["strecthed_audio"], sr=DEFAULT_SR)
+        beat_times = librosa.frames_to_time(beat_times, sr=DEFAULT_SR)
+        first_beats.append(beat_times[0])
 
-        latest_beat = max(first_downbeats)
-        latest_beat_index = first_downbeats.index(latest_beat)
+    latest_beat = max(first_downbeats)
+    latest_beat_index = first_downbeats.index(latest_beat)
 
-        fixed_audio = stretched_audios[latest_beat_index]
+    fixed_audio = stretched_audios[latest_beat_index]
 
-        final_audios.append(fixed_audio)
+    final_audios.append(fixed_audio)
 
-        for i in range(0, len(stretched_audios)):
-            if i != latest_beat_index:
-                shift_difference = np.abs(first_downbeats[i] - latest_beat)
-                silence_samples = int(shift_difference * DEFAULT_SR)
-                silence = np.zeros(silence_samples)
+    for i in range(0, len(stretched_audios)):
+        if i != latest_beat_index:
+            shift_difference = np.abs(first_downbeats[i] - latest_beat)
+            silence_samples = int(shift_difference * DEFAULT_SR)
+            silence = np.zeros(silence_samples)
 
-                final_audio = np.concatenate([silence, stretched_audios[i]])
-
-                # rechecking downbeats after shift
-                print("rechecking downbeat alignment")
-                _, beat_times = librosa.beat.beat_track(y=final_audio, sr=DEFAULT_SR)
-                downbeat_times = librosa.frames_to_time(beat_times, sr=DEFAULT_SR)
-                print(downbeat_times[0])
-
-                final_audios.append(final_audio)
-    except:
-        invalid_mixture = True
+            final_audio = np.concatenate([silence, stretched_audios[i]])
+            final_audios.append(final_audio)
 
     return final_audios, invalid_mixture
 
