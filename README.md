@@ -1,5 +1,7 @@
 # stem_mixer
-this package will take a folder of stems and create coherent mixtures of desired length and stem count (defaults will be provided if not given). the user can also declare a harmonic-to-percussive ratio they would like the mixtures to follow (again, defaults will be provided if not given). an output folder will be created where the mixtures will be stored as folders themselves in which the final audio file and its respective stem audio files will go. metadata will be inferred for each stem or assigned if stem matches into a supported dataset. the user could also manually provide metadata about the stems they are using which could increase coherency of results if they are certain about specific attributes. however, the package is designed to generate coherent mixtures even when no initial metadata is given as a pre-processing step. the goal is that this package can help increase the diversity of mixture / stem data being used to train source-separation models and allow for data mobility outside of traditional, western datasets. 
+Create coherent mixtures from a folder with stems you have. The package will infer the needed metadata from the audio files and use it to create mixtures.
+
+This package aims to increase the diversity of instruments in mixtures used to train source-separation models.
 
 # example usage - metadata creation
 
