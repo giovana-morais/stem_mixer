@@ -1,5 +1,5 @@
 # stem_mixer
-Create coherent mixtures from a folder with stems you have. The package will infer the needed metadata from the audio files and use it to create mixtures.
+Create coherent mixtures from a folder with any provided stems. The package will infer the needed metadata from the audio files and use it to create mixtures. This package currently only supports .wav audio files. 
 
 This package aims to increase the diversity of instruments in mixtures used to train source-separation models.
 
