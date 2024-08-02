@@ -1,11 +1,13 @@
 # stem_mixer
-this package will take a folder of stems and create coherent mixtures of desired length and stem count (defaults will be provided if not given). the user can also declare a harmonic-to-percussive ratio they would like the mixtures to follow (again, defaults will be provided if not given). an output folder will be created where the mixtures will be stored as folders themselves in which the final audio file and its respective stem audio files will go. metadata will be inferred for each stem or assigned if stem matches into a supported dataset. the user could also manually provide metadata about the stems they are using which could increase coherency of results if they are certain about specific attributes. however, the package is designed to generate coherent mixtures even when no initial metadata is given as a pre-processing step. the goal is that this package can help increase the diversity of mixture / stem data being used to train source-separation models and allow for data mobility outside of traditional, western datasets. 
+Create coherent mixtures from a folder with any provided stems. The package will infer the needed metadata from the audio files and use it to create mixtures. This package currently only supports .wav audio files. 
+
+This package aims to increase the diversity of instruments in mixtures used to train source-separation models.
 
 # example usage - metadata creation
 
 SUPPORTED DATASETS FOR NON-INFERRAL METADATA CREATION:
-- BRID (Brazilian Rhythmic Instruments Dataset)
-- MUSDB18* 
+- [BRID (Brazilian Rhythmic Instruments Dataset)](https://www.researchgate.net/publication/331589840_A_Novel_Dataset_of_Brazilian_Rhythmic_Instruments_and_Some_Experiments_in_Computational_Rhythm_Analysis)
+- [MUSDB18*](https://sigsep.github.io/datasets/musdb.html) 
 
 *note: if using MUSDB18, pre-pre-processing step required --> 
 - must save each stem with "vocals", "drums", "bass", "other" as prefix in .wav filename
