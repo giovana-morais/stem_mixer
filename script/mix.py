@@ -9,8 +9,6 @@ import librosa
 import numpy as np
 import soundfile as sf
 
-#import timeit
-
 DEFAULT_SR = 44100
 
 def organize_files(data_home, n_stems, n_harmonic, n_percussive):
@@ -49,6 +47,7 @@ def organize_files(data_home, n_stems, n_harmonic, n_percussive):
     if n_harmonic + n_percussive != n_stems:
         n_harmonic = n_stems // 2
         n_percussive = n_stems - n_harmonic
+
 
     json_files = glob.glob(os.path.join(data_home, "*.json"))
 
@@ -92,6 +91,10 @@ def organize_files(data_home, n_stems, n_harmonic, n_percussive):
                         "instrument" : instrument_name,
                         "key" : key
                         }
+
+    print("tempo bin harmonic ", tempo_bin_harmonic[100])
+    print("tempo bin percussive ", tempo_bin_percussive)
+
 
     return n_harmonic, n_percussive, tempo_bin_harmonic, tempo_bin_percussive
 
@@ -181,7 +184,7 @@ def select_tracks(data_home, n_stems, n_harmonic, n_percussive, tempo_bin_harmon
 
             else:
                 invalid_mixture = True
-                #print("invalid, tempo bin DNE")
+                print("invalid, tempo bin DNE")
 
         list_of_instruments = []
         for stem in selected_stems.keys():
@@ -193,19 +196,17 @@ def select_tracks(data_home, n_stems, n_harmonic, n_percussive, tempo_bin_harmon
         filtered_instruments = [instr for instr in list_of_instruments if instr is not None]
         if len(filtered_instruments) != len(set(filtered_instruments)): # checking for repeated instruments
             invalid_mixture = True # if instruments repeat, invalid mixture
-            #print("invalid, instrument repetition")
+            print("invalid, instrument repetition")
 
         if len(selected_stems) != n_stems: # if, for some reason, selected stems less than number of stems, invalid mixture
             invalid_mixture = True
-            #print("invalid, cant fill desired number of stems")
+            print("invalid, cant fill desired number of stems")
 
     except ValueError: # if any error gets thrown, invalid mixture
         invalid_mixture = True
-        #print("invalid, unexpected error")
+        print("invalid, unexpected error")
 
-    print("selected stems:")
-    for stem_name in selected_stems.keys():
-        print(stem_name)
+    print("selected stems: ", selected_stems)
 
     return selected_stems, base_tempo, invalid_mixture
 
@@ -240,18 +241,22 @@ def stretch(data_home, n_stems, selected_stems, base_tempo):
 
     #if invalid_mixture == False:
     target_tempo = base_tempo
+    print("target tempo", target_tempo)
 
     for i in range(0, n_stems):
         stem_to_stretch = selected_stems_keys[i]
         current_tempo = selected_stems[stem_to_stretch][0] # extracting tempo from dict
-        #print("current tempo", current_tempo)
+        print("current tempo", current_tempo)
 
         for file in audio_files: # is there a way to make this more efficient?
             if stem_to_stretch in file:
-                #print("audio file found: ", stem_to_stretch)
+                print("audio file found: ", stem_to_stretch)
                 wav_file = file
 
         audio, sr = librosa.load(wav_file, sr=DEFAULT_SR)
+        audio_norm = librosa.util.normalize(audio)
+
+        audio, sr = librosa.load(wav_file, sr=sr)
         audio_norm = librosa.util.normalize(audio)
 
         new_rate = float(target_tempo / current_tempo)
@@ -261,7 +266,7 @@ def stretch(data_home, n_stems, selected_stems, base_tempo):
 
     if len(stretched_audios) != n_stems:
         invalid_mixture = True
-        #print("invalid, we lost a stretched audio")
+        print("invalid, we lost a stretched audio")
 
     return stretched_audios, invalid_mixture
 
@@ -316,13 +321,10 @@ def shift(stretched_audios):
 
 
                 # rechecking downbeats after shift
-
-                # commenting this out for now, maybe we can re-implement as a check
-
-                #print("rechecking downbeat alignment")
-                #_, beat_times = librosa.beat.beat_track(y=final_audio, sr=DEFAULT_SR)
-                #downbeat_times = librosa.frames_to_time(beat_times, sr=DEFAULT_SR)
-                #print(downbeat_times[0])
+                print("rechecking downbeat alignment")
+                _, beat_times = librosa.beat.beat_track(y=final_audio, sr=DEFAULT_SR)
+                downbeat_times = librosa.frames_to_time(beat_times, sr=DEFAULT_SR)
+                print(downbeat_times[0])
 
                 final_audios.append(final_audio)
     except:
@@ -385,7 +387,7 @@ def concatenate(data_home, duration, final_audios):
     for stem in truncated_stems:
         if len(stem) == 0:
             invalid_mixture = True
-            #print("invalid, empty stem")
+            print("invalid, empty stem")
         mixture_audio += stem
 
     if not invalid_mixture: # if it passes all checks
@@ -454,8 +456,6 @@ def generate_mixtures(data_home, n_mixtures, n_stems, n_harmonic, n_percussive, 
 
         count += 1
 
-        pass
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         prog="StemMixer", description="Generating mixtures"
@@ -495,11 +495,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     kwargs = vars(args)
 
-    """
-    runtime = timeit.timeit('generate_mixtures(args.data_home, args.n_mixtures, args.n_stems,args.n_harmonic,args.n_percussive,args.duration)', globals=globals(), number=1)
-    print(f'Runtime: {runtime} seconds')
-    """
-
 
     generate_mixtures(
         args.data_home,
@@ -509,5 +504,3 @@ if __name__ == "__main__":
         args.n_percussive,
         args.duration
     )
-
-
