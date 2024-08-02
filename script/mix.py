@@ -92,9 +92,6 @@ def organize_files(data_home, n_stems, n_harmonic, n_percussive):
                         "key" : key
                         }
 
-    print("tempo bin harmonic ", tempo_bin_harmonic[100])
-    print("tempo bin percussive ", tempo_bin_percussive)
-
 
     return n_harmonic, n_percussive, tempo_bin_harmonic, tempo_bin_percussive
 
