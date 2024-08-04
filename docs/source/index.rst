@@ -20,6 +20,7 @@ Getting Started
 
    introduction 
    contributing
+   supported
    tutorial
 
 

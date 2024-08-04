@@ -1,5 +1,5 @@
-Contributing to ``stem_mixer``
-==============================
+Contributing
+============
 
 Contributions to improve and maintain this project are both welcome and appreciated. This guide outlines the steps and best practices for contributing.
 
