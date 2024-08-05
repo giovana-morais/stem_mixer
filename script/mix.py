@@ -108,13 +108,9 @@ def time_stretch(stems, base_tempo):
     return stems
 
 
-def shift(stems):
+def align_stems(stems):
     """
-    Receives audios post-stretching and collects information on their first downbeats and stores as
-    a list. It then finds the index of the audio of the latest downbeat and holds that audio
-    constant while shifting every other audio by the difference between their first downbeat
-    and the latest-occurring first downbeat by padding audiofile with zeroes. It then double checks
-    first-downbeats to make sure that they are all the same.
+    Zero pad stems so their first beat is aligned.
 
     Parameters
     ----------
@@ -123,37 +119,33 @@ def shift(stems):
 
     Returns
     -------
-    final_audios(list): list of shifted audios
+    aligned_stems : list(dict)
+        stems with audio correct
     """
 
-    first_beats = []
-    final_audios = []
+    aligned_stems = stems.copy()
 
-    for s in stems:
-        _, beat_frames = librosa.beat.beat_track(y=s["strecthed_audio"], sr=DEFAULT_SR)
-        beat_times = librosa.frames_to_time(beat_times, sr=DEFAULT_SR)
-        first_beats.append(beat_times[0])
+    latest_beat_time = 0
 
-    latest_beat = max(first_downbeats)
-    latest_beat_index = first_downbeats.index(latest_beat)
+    for s in aligned_stems:
+        _, beat_frames = librosa.beat.beat_track(y=s["stretched_audio"], sr=DEFAULT_SR)
+        beat_times = librosa.frames_to_time(beat_frames, sr=DEFAULT_SR)
+        s["first_beat_time"] = beat_times[0]
 
-    fixed_audio = stretched_audios[latest_beat_index]
+        if s["first_beat_time"] > latest_beat_time:
+            latest_beat_time = s["first_beat_time"]
 
-    final_audios.append(fixed_audio)
+    for s in aligned_stems:
+        shift_difference = np.abs(s["first_beat_time"] - latest_beat_time)
+        silence_samples = int(shift_difference * DEFAULT_SR)
+        silence = np.zeros(silence_samples)
 
-    for i in range(0, len(stretched_audios)):
-        if i != latest_beat_index:
-            shift_difference = np.abs(first_downbeats[i] - latest_beat)
-            silence_samples = int(shift_difference * DEFAULT_SR)
-            silence = np.zeros(silence_samples)
+        s["stem_audio"] = np.pad(s["stretched_audio"], (silence_samples, 0), "constant", constant_values=(0,0))
 
-            final_audio = np.concatenate([silence, stretched_audios[i]])
-            final_audios.append(final_audio)
-
-    return final_audios, invalid_mixture
+    return aligned_stems
 
 
-def concatenate(data_home, duration, final_audios):
+def mix(data_home, duration, stems):
     """
     Creates output folder for mixtures if it does not already exist. Receives final processed
     audios and cuts them all to the length of the shortest audio to ensure there will be no
@@ -250,11 +242,9 @@ def generate_mixtures(**kwargs):
         print("trying to fetch a mixture")
 
         stems, base_tempo = select_stems(**kwargs)
-        print(stems)
-
         stems = time_stretch(stems, base_tempo)
-        # final_audios = shift(stretched_audios)
-        # concatenate(data_home, duration, final_audios)
+        stems = align_stems(stems)
+        mix(data_home, duration, final_audios)
 
         # print("sending valid mixture to folder ...\n")
 
