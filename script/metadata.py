@@ -304,9 +304,6 @@ def process(data_home, datasets=None):
         track_metadata = dict_template(data_home, tid)
         feature_extraction(os.path.join(data_home, tid), track_metadata=track_metadata)
 
-    # TODO: now that the metadata is processed, we consolidate the information into a
-    # csv file
-    # consolidate_index(all_stems, "data_index.csv")
     return
 
 
