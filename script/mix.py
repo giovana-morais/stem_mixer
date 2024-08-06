@@ -1,6 +1,5 @@
 import argparse
 import os
-import glob
 import json
 import random
 import uuid
@@ -12,9 +11,11 @@ import soundfile as sf
 import tqdm
 
 DEFAULT_SR = 44100
-# MAX_TRIES = 10
 
-def select_stems(n_percussive, n_harmonic, data_home, index_file, base_stem=None, **kwargs):
+
+def select_stems(
+    n_percussive, n_harmonic, data_home, index_file, base_stem=None, **kwargs
+):
     """
     select stems from the index
 
@@ -33,79 +34,101 @@ def select_stems(n_percussive, n_harmonic, data_home, index_file, base_stem=None
         base_tempo : int
             tempo_bin from the base stem
     """
-
     index = pd.read_csv(os.path.join(data_home, index_file))
+    tempo_choices = possible_tempo_bins(index, n_harmonic, n_percussive)
+
+    # print(tempo_choices)
+    tempo = random.choice(tempo_choices)
+    # print(tempo_choices, tempo)
 
     # base_stem for now is random if not provided
     if base_stem is not None:
         base_stem = index[index["stem_name"] == base_stem]
     elif n_percussive > 0:
-        base_stem = index[index["sound_class"] == "percussive"].sample()
-    else:
-        base_stem = index[index["sound_class"] == "harmonic"].sample()
+        n_percussive -= 1
+        base_stem = index[
+            (index["sound_class"] == "percussive") & (index["tempo_bin"] == tempo)
+        ].sample()
+    elif n_harmonic > 0:
+        n_harmonic -= 1
+        base_stem = index[
+            (index["sound_class"] == "harmonic") & (index["tempo_bin"] == tempo)
+        ].sample()
 
-    index.drop(base_stem.index, inplace=True)
+    # remove base_stem from index so we don't use it twice
+    index = index.drop(base_stem.index)
 
     base_stem = base_stem.to_dict("records")[0]
-    print(f"TEMPO BIN: {base_stem['tempo_bin']}")
-
-    # update n_percussives/n_harmonics
-    # @lindsey: what if base_stem is undetermined?
-    if base_stem["sound_class"] == "percussive":
-        n_percussive -= 1
-    elif base_stem["sound_class"] == "harmonic":
-        n_harmonic -= 1
-
     base_tempo = base_stem["tempo_bin"]
+    tempo_octaves = [int(i * base_tempo) for i in [0.5, 1, 2, 4]]
 
-    # here is where we can also add tempo octaves
     index_filtered = index[
-            (index["tempo_bin"] == base_stem["tempo_bin"])
-            & (index["instrument_name"] != base_stem["instrument_name"])
-        ]
+        (index["tempo_bin"].isin(tempo_octaves))
+        & (index["instrument_name"] != base_stem["instrument_name"])
+    ]
 
-    # TODO: add instrument checking
+    # TODO: add instrument check
 
-    # sample percussive
+    # TODO: what to do with undetermined stems?
+    # sample percussive stems
     percussive = []
     if n_percussive > 0:
         percussive_index = index_filtered[index_filtered["sound_class"] == "percussive"]
-        if len(percussive_index) < n_percussive:
-            raise ValueError("Number of requested percussive stems is smaller than stems available in this tempo_bin")
-
+        # if len(percussive_index) < n_percussive:
+        #     print("no percussive tracks left on this tempo bin!")
         percussive = percussive_index.sample(n_percussive).to_dict("records")
 
-    # sample harmonic
+    # sample harmonic stems
     harmonic = []
     if n_harmonic > 0:
         harmonic_index = index_filtered[index_filtered["sound_class"] == "harmonic"]
-        if len(harmonic_index) < n_harmonic:
-            raise ValueError("Number of requested harmonic stems is smaller than stems available in this tempo_bin")
-
+        # if len(harmonic_index) < n_harmonic:
+        #     print("no harmonic tracks left on this tempo bin!")
         harmonic = harmonic_index.sample(n_harmonic).to_dict("records")
-        print(len(harmonic))
 
+    # combine everything into single list
     stems = [base_stem] + percussive + harmonic
-
-    # print(stems)
-    print(f"we want {n_harmonic + n_percussive + 1} stems")
-    print(f"we got {len(stems)} stems")
-
     return stems, base_tempo
 
 
-def time_stretch(stems, base_tempo):
+def possible_tempo_bins(index, n_harmonic, n_percussive):
     """
-    Receives base tempo and selected stem dictionary with metadata related to their original tempo,
-    instrument, and key. Then stretches stems to be the same tempo as base tempo. Also implements
-    checks of mixture validity.
+    return all possible tempo_bins that can be used for the provided n_harmonic and
+    n_percussive
+    """
+
+    all_tempo_bins = index["tempo_bin"].unique()
+    tempo_bin_count = index[["tempo_bin", "sound_class"]].value_counts()
+
+    possible_tempo = []
+
+    for tempo in all_tempo_bins:
+        # hmmmm i'm not sure about this try/except blocks but i didnt find
+        # anything better for now
+        try:
+            qty_harmonic = tempo_bin_count[(tempo, "harmonic")]
+        except KeyError:
+            qty_harmonic = 0
+
+        try:
+            qty_percussive = tempo_bin_count[(tempo, "percussive")]
+        except KeyError:
+            qty_percussive = 0
+
+        if qty_harmonic >= n_harmonic and qty_percussive >= n_percussive:
+            possible_tempo.append(tempo)
+
+    return possible_tempo
+
+
+def time_stretch(stems, base_tempo, duration):
+    """
+    receive a base_tempo and stretch select stems to match it.
 
     Parameters
     ---------
-        data_home(str): path to data home
-        n_stems(int): number of stems in output mixture
-        selected_stems(dict): stem names with respective metadata to be stretched
-        base_tempo(int): tempo all stems will be adjusted to
+        stems : list[dict]
+        base_tempo : float
 
     Returns
     -------
@@ -116,15 +139,17 @@ def time_stretch(stems, base_tempo):
         stem_tempo = s["tempo"]
 
         audio_path = os.path.join(s["data_home"], s["stem_name"])
-        audio, sr = librosa.load(audio_path, sr=DEFAULT_SR)
+        # removing silences at beginning and ending
+        audio, sr = librosa.load(audio_path, sr=DEFAULT_SR, duration=duration * 2)
+        audio, _ = librosa.effects.trim(audio)
 
-        new_tempo = base_tempo/stem_tempo
+        new_tempo = base_tempo / stem_tempo
         s["stretched_audio"] = librosa.effects.time_stretch(audio, rate=new_tempo)
 
     return stems
 
 
-def align_stems(stems):
+def align_first_beat(stems):
     """
     Zero pad stems so their first beat is aligned.
 
@@ -154,9 +179,12 @@ def align_stems(stems):
     for s in aligned_stems:
         shift_difference = np.abs(s["first_beat_time"] - latest_beat_time)
         silence_samples = int(shift_difference * DEFAULT_SR)
-        silence = np.zeros(silence_samples)
-
-        s["audio"] = np.pad(s["stretched_audio"], (silence_samples, 0), "constant", constant_values=(0,0))
+        s["audio"] = np.pad(
+            s["stretched_audio"],
+            (silence_samples, 0),
+            "constant",
+            constant_values=(0, 0),
+        )
 
     return aligned_stems
 
@@ -188,39 +216,27 @@ def mix(duration, stems, strategy="cut"):
 
     """
 
-    for s in stems:
-        s["audio"] = librosa.util.fix_length(data=s["audio"], size=int(duration*DEFAULT_SR))
-
-    # final_audios_lengths = []
-    # for stem in final_audios:
-    #     final_audios_lengths.append(len(stem))
-
-    # min_length = min(final_audios_lengths)
-
-    # if min_length < duration:
-    #     invalid_mixture = True  # checking min length against duration
-
-    # total_length = min_length
-    # start_sample = max(0, total_length - int(duration * DEFAULT_SR))
-    # end_sample = total_length
-
-    # truncated_stems = []
-    # for audio in final_audios:
-    #     audio = audio[:min_length]
-    #     audio = audio[start_sample:end_sample]
-    #     truncated_stems.append(audio)
-
-    # length = len(truncated_stems[0])
-    mixture_audio = np.zeros(int(duration*DEFAULT_SR))  # initialization
+    mixture_length = int(duration * DEFAULT_SR)
+    mixture_audio = np.zeros(mixture_length)
 
     for s in stems:
+        # pad ending with zeros
+        s["audio"] = librosa.util.fix_length(data=s["audio"], size=mixture_length)
         mixture_audio += librosa.util.normalize(s["audio"])
 
     return mixture_audio, stems
 
 
-def generate_mixtures(data_home, n_mixtures, n_stems, n_harmonic, n_percussive,
-        duration, index_file, output_folder):
+def generate_mixtures(
+    data_home,
+    n_mixtures,
+    n_stems,
+    n_harmonic,
+    n_percussive,
+    duration,
+    index_file,
+    output_folder,
+):
     """
     Parameters
     ----------
@@ -233,24 +249,34 @@ def generate_mixtures(data_home, n_mixtures, n_stems, n_harmonic, n_percussive,
 
     Returns
     -------
-
     None
     """
 
     stems, base_tempo = select_stems(**kwargs)
-    stems = time_stretch(stems, base_tempo)
-    stems = align_stems(stems)
+    stems = time_stretch(stems, base_tempo, duration)
+    stems = align_first_beat(stems)
     mixture, stems = mix(duration, stems)
     save_mixture(output_folder, mixture, stems)
 
     return
 
+
 def save_mixture(output_folder, mixture, stems):
     """
     write mixture to .wav file and metadata to .json file
     """
+    os.makedirs(output_folder, exist_ok=True)
     mixture_id = str(uuid.uuid4())
-    sf.write(f"{os.path.join(output_folder, mixture_id)}.wav", mixture, DEFAULT_SR)
+    mixture_path = os.path.join(output_folder, mixture_id)
+
+    sf.write(f"{mixture_path}.wav", mixture, DEFAULT_SR)
+
+    for s in stems:
+        s.pop("stretched_audio", None)
+        s.pop("audio", None)
+
+    with open(f"{mixture_path}.json", "w") as f:
+        json.dump(stems, f)
 
     return
 
@@ -313,8 +339,6 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-
-    os.makedirs(args.output_folder, exist_ok=True)
 
     if args.n_harmonic + args.n_percussive != args.n_stems:
         args.n_harmonic = args.n_stems // 2
