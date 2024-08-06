@@ -2,9 +2,11 @@
 **/__pycache__/
 **/.ipynb_checkpoints/
 .ruff_cache/
-docs/_build/
-docs/_static/
-docs/_templates/
+
+# sphinx config
+docs/build/
+docs/static/
+docs/templates/
 
 **/*.wav
 **/*.mp3
