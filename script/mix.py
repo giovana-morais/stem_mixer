@@ -189,7 +189,7 @@ def align_first_beat(stems):
     return aligned_stems
 
 
-def mix(duration, stems, strategy="cut"):
+def mix(duration, stems, strategy="zeros"):
     """
     Receives final processed
     audios and cuts them all to the length of the shortest audio to ensure there will be no
@@ -199,10 +199,10 @@ def mix(duration, stems, strategy="cut"):
 
     Parameters
     ----------
-
-    data_home(str): path to stems
-    duration(float): desired duraiton
-    final_audios(list): stretched and padded audios
+    duration : float
+        desired duraiton
+    stems : list[dict]
+        list with stems we're combining
     strategy : str
         strategy to deal with stems shorter than desired mixture duration.
         * zeros: add silence to the end of the stem (default)
@@ -210,15 +210,14 @@ def mix(duration, stems, strategy="cut"):
         * repeat: repeat stem and cut it to match mixture duration
 
     Returns
-    ________
-
+    ----------
     None
-
     """
 
     mixture_length = int(duration * DEFAULT_SR)
     mixture_audio = np.zeros(mixture_length)
 
+    # TODO: implement strategies
     for s in stems:
         # pad ending with zeros
         s["audio"] = librosa.util.fix_length(data=s["audio"], size=mixture_length)
