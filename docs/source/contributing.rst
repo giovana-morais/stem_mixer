@@ -20,25 +20,21 @@ To submit code, follow these steps:
 -**Make and Test Changes**: Ensure your changes work as expected.
 -**Submit a Pull Request**: Create a pull request on Github to begin merge.
 
-Always provide a clear description of your changes. 
+Always provide a clear description of your changes.
 
 
 Testing
 -------
 
-Before submitting a pull request, ensure your changes are tested. Specific tests are provided in the ``stem_mixer`` folder, however it might be necessary to make your own depending on the change. 
+Before submitting a pull request, ensure your changes are tested. Specific tests are provided in the ``stem_mixer`` folder, however it might be necessary to make your own depending on the change.
 Run the following:
 
 .. code-block:: shell
 
-    pytest tests/ 
+    pytest tests/
 
-Ensure all the tests pass before submitting a pull request. 
+Ensure all the tests pass before submitting a pull request.
 
-Contacts
---------
-
-To ask any questions about the library, please email lgp3212@nyu.edu. 
 
 Acknowledgements
 ----------------

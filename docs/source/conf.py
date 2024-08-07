@@ -14,7 +14,13 @@ release = "0.1.0"
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = []
+import sys
+import os
+sys.path.insert(0, os.path.abspath('../../stem_mixer'))
+
+extensions = [
+    "sphinx.ext.autodoc",
+]
 
 templates_path = ["_templates"]
 exclude_patterns = []
