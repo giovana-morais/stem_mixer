@@ -5,22 +5,24 @@ stem_mixer documentation
 
 
 Getting Started
-^^^^^^^^^^^^^^^
+---------------
 .. toctree::
-    :caption: Getting Started
-    :maxdepth: 2
+   :caption: Getting Started
+   :maxdepth: 2
 
-    install
-    tutorial
-    troubleshooting
+   install
+   tutorial
+   troubleshooting
+   supported_datasets
+   contributing
 
 
 API documentation
-^^^^^^^^^^^^^^^^^^
+-----------------
 .. toctree::
-    :caption: API documentation
-    :maxdepth: 2
+   :caption: API documentation
+   :maxdepth: 2
 
-    features
-    metadata
-    mix
+   features
+   metadata
+   mix

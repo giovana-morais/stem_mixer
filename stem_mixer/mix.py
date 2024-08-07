@@ -2,17 +2,17 @@
 # -*- coding: utf-8 -*-
 """
 Mix
-=======
+===
 .. autosummary::
    :toctree: generated/
 
-    select_stems
-    possible_tempo_bins
-    time_stretch
-    align_first_beat
-    mix
-    generate_mixtures
-    save_mixture
+   select_stems
+   possible_tempo_bins
+   time_stretch
+   align_first_beat
+   mix
+   generate_mixtures
+   save_mixture
 """
 import argparse
 import os
@@ -32,14 +32,13 @@ DEFAULT_SR = 44100
 def select_stems(
     n_percussive, n_harmonic, data_home, index_file, base_stem=None, **kwargs
 ):
-    r"""
-    select stems from the index
+    """
+    Select stems from a given index
 
     Parameters
     -----------
     base_stem : str
-    **kwargs : dict
-        additional arguments
+    \*\*kwargs : dict additional arguments
 
     Returns
     -------
@@ -268,6 +267,8 @@ def generate_mixtures(
     output_folder,
 ):
     """
+    Main method to generate mixtures
+
     Parameters
     ----------
     data_home : str

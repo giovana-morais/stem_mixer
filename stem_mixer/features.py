@@ -6,9 +6,9 @@ Features
 .. autosummary::
    :toctree: generated/
 
-    tempo
-    tempo_bin
-    sound_class
+   tempo
+   tempo_bin
+   sound_class
 """
 import math
 
@@ -28,7 +28,7 @@ def tempo(stem_path):
         path to the audio stem file.
 
     Returns
-    ------
+    -------
     tempo : float
         The estimated tempo of the audio file.
     """
@@ -60,7 +60,7 @@ def sound_class(stem_path):
     Extracts the sound class (harmonic / percussive) from an audio stem file.
 
     Parameters
-    ---------
+    ----------
     stem_path : str
         path to the audio stem file.
 

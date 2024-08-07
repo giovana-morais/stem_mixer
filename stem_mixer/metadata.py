@@ -6,12 +6,12 @@ Metadata
 .. autosummary::
    :toctree: generated/
 
-    dict_template
-    feature_extraction
-    check_file_number
-    save_stem_dataframe
-    brid_track_info
-    musdb_track_info
+   dict_template
+   feature_extraction
+   check_file_number
+   save_stem_dataframe
+   brid_track_info
+   musdb_track_info
 """
 import argparse
 import glob
