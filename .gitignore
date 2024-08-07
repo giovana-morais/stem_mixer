@@ -5,8 +5,7 @@
 
 # sphinx config
 docs/build/
-docs/static/
-docs/templates/
+docs/source/generated/
 
 **/*.wav
 **/*.mp3

@@ -1,3 +1,19 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+Mix
+=======
+.. autosummary::
+   :toctree: generated/
+
+    select_stems
+    possible_tempo_bins
+    time_stretch
+    align_first_beat
+    mix
+    generate_mixtures
+    save_mixture
+"""
 import argparse
 import os
 import json
@@ -16,23 +32,23 @@ DEFAULT_SR = 44100
 def select_stems(
     n_percussive, n_harmonic, data_home, index_file, base_stem=None, **kwargs
 ):
-    """
+    r"""
     select stems from the index
 
-    arguments
-    ---
-        base_stem : str
-        **kwargs : dict
-            additional arguments
+    Parameters
+    -----------
+    base_stem : str
+    **kwargs : dict
+        additional arguments
 
-    return
-    ---
-        stems : list[dict]
-            list with stems that will be used for mixture
-            each element of the list is a dictionary with the necessary
-            information about that stem.
-        base_tempo : int
-            tempo_bin from the base stem
+    Returns
+    -------
+    stems : list[dict]
+        list with stems that will be used for mixture
+        each element of the list is a dictionary with the necessary
+        information about that stem.
+    base_tempo : int
+        tempo_bin from the base stem
     """
     index = pd.read_csv(os.path.join(data_home, index_file))
     tempo_choices = possible_tempo_bins(index, n_harmonic, n_percussive)
@@ -92,9 +108,24 @@ def select_stems(
 
 
 def possible_tempo_bins(index, n_harmonic, n_percussive):
-    """
+    r"""
     return all possible tempo_bins that can be used for the provided n_harmonic and
     n_percussive
+
+    Parameters
+    ----------
+    index : pd.DataFrame
+        dataframe with stems information
+    n_harmonic : int
+        number of harmonic stems for a given mixture
+    n_percussive : int
+        number of percussive stems for a given mixture
+
+    Returns
+    -------
+    possible_tempo : list
+        list with tempo_bins that have at least n_harmonic and n_percussive
+        tracks
     """
 
     all_tempo_bins = index["tempo_bin"].unique()
@@ -122,17 +153,17 @@ def possible_tempo_bins(index, n_harmonic, n_percussive):
 
 
 def time_stretch(stems, base_tempo, duration):
-    """
-    receive a base_tempo and stretch select stems to match it.
+    r"""
+    Receive a base_tempo and stretch select stems to match it.
 
     Parameters
-    ---------
-        stems : list[dict]
-        base_tempo : float
+    ----------
+    stems : list[dict]
+    base_tempo : float
 
     Returns
     -------
-        stems
+    stems
     """
 
     for s in stems:
@@ -150,7 +181,7 @@ def time_stretch(stems, base_tempo, duration):
 
 
 def align_first_beat(stems):
-    """
+    r"""
     Zero pad stems so their first beat is aligned.
 
     Parameters
@@ -190,7 +221,7 @@ def align_first_beat(stems):
 
 
 def mix(duration, stems, strategy="zeros"):
-    """
+    r"""
     Receives final processed
     audios and cuts them all to the length of the shortest audio to ensure there will be no
     silence. Creates a list of the truncated stems and cuts them again to fit desired duration>
@@ -239,12 +270,18 @@ def generate_mixtures(
     """
     Parameters
     ----------
-    data_home(str): path to stems
-    n_mixtures(int): number of mixtures
-    n_stems(int): number of stems per mixture
-    n_harmonic(int): number of harmonic stems
-    n_percussive(int): number of percussive stems
-    duration(float): mixture duration
+    data_home : str
+        path to stems
+    n_mixtures : int
+        number of mixtures
+    n_stems : int
+        number of stems per mixture
+    n_harmonic : int
+        number of harmonic stems
+    n_percussive : int
+        number of percussive stems
+    duration : float
+        mixture duration
 
     Returns
     -------
@@ -263,6 +300,19 @@ def generate_mixtures(
 def save_mixture(output_folder, mixture, stems):
     """
     write mixture to .wav file and metadata to .json file
+
+    Parameters
+    ----------
+    output_folder : str
+        path to folder where we will save mixtures
+    mixture : np.array
+        mixture audio
+    stems : dict
+        dictionary with metadata about the stems used to create the mixture
+
+    Returns
+    -------
+    None
     """
     os.makedirs(output_folder, exist_ok=True)
     mixture_id = str(uuid.uuid4())

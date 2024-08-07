@@ -1,3 +1,18 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+Metadata
+========
+.. autosummary::
+   :toctree: generated/
+
+    dict_template
+    feature_extraction
+    check_file_number
+    save_stem_dataframe
+    brid_track_info
+    musdb_track_info
+"""
 import argparse
 import glob
 import json
@@ -14,8 +29,18 @@ MUSDB_INDEX = "musdb_index.txt"
 
 
 def dict_template(data_home=None, stem_name=None):
-    """
-    create empty metadata dictionary
+    r"""
+    Create empty metadata dictionary
+
+    Parameters
+    ----------
+    data_home : str or None
+    stem_name : str or None
+
+    Returns
+    -------
+    metadata : dict
+        dictionary with empty metadata
     """
 
     metadata = {
@@ -30,19 +55,21 @@ def dict_template(data_home=None, stem_name=None):
 
 
 def feature_extraction(stem_path, track_metadata=None, overwrite=False):
-    """
+    r"""
     Takes file path to a stem, calculate features and save the metadata as JSON.
 
-    Parameters:
-        stem_path: str
-            Path to the audio stem file.
-        metadata: dict (optional)
-            dictionary with pre-computed metadata
-        overwrite: boolean
-            if True, overwrite a JSON file that already exists
+    Parameters
+    ----------
+    stem_path: str
+        Path to the audio stem file.
+    metadata: dict (optional)
+        dictionary with pre-computed metadata
+    overwrite: boolean
+        if True, overwrite a JSON file that already exists
 
-    Returns:
-        None
+    Returns
+    -------
+    None
     """
 
     json_file_path = os.path.splitext(stem_path)[0] + ".json"
@@ -99,22 +126,27 @@ def save_stem_dataframe(data_home, index_file="index.csv"):
 
 
 def brid_track_info(data_home, tid):
-    """
+    r"""
     BRID DATASET PRE-PROCESSING
 
     Takes file path to BRID stem and assigns instrument variable based on file name
 
-    Parameters:
-        data_home : str
-            folder containing stems
-        tid : str
-            track id
+    Parameters
+    ----------
+    data_home : str
+        folder containing stems
+    tid : str
+        track id
 
-    Returns:
-        tempo (float) : tempo of stem based on style
-        instrument_name (str) : name of BRID instrument if exists
-        key : null
-        sound_class (str) : sound_class of BRID stem, "percussive"
+    Returns
+    -------
+    tempo : float
+        tempo of stem based on style
+    instrument_name : str
+        name of BRID instrument if exists
+    key : None
+    sound_class : str
+        sound_class of BRID stem, "percussive"
     """
 
     track_metadata = dict_template()
@@ -182,7 +214,7 @@ def musdb(data_home):
 
 
 def musdb_track_info(data_home, tid):
-    """
+    r"""
     MUSDB DATASET PRE-PROCESSING
 
     Takes file path to MUSDB stem and assigns variables based on file name
@@ -193,17 +225,21 @@ def musdb_track_info(data_home, tid):
 
     i.e. "Bobby Nobody - Stich Up - drums.wav"
 
-    Parameters:
-        data_home : str
-            path to folder containing stems
-        tid: str
-            track id
+    Parameters
+    ----------
+    data_home : str
+        path to folder containing stems
+    tid: str
+        track id
 
-    Returns:
-        tempo : None
-        instrument_name (str) : name of MUSDB instrument / type if exists
-        key : null
-        sound_class : sound class of stem if instrument_name exists and is "vocals", "drums", "bass", or "other"
+    Returns
+    -------
+    tempo : None
+    instrument_name : str
+        name of MUSDB instrument / type if exists
+    key : None
+    sound_class : str
+        sound class of stem if instrument_name exists and is "vocals", "drums", "bass", or "other"
     """
     track_metadata = dict_template(data_home=data_home, stem_name=tid)
 
@@ -227,7 +263,7 @@ def musdb_track_info(data_home, tid):
 
 
 def brid(data_home):
-    """
+    r"""
     create metadata for BRID tracks present in `data_home`.
     """
     brid_stems = stems_from_file(BRID_INDEX)
@@ -251,7 +287,7 @@ def brid(data_home):
 
 
 def stems_from_file(filename):
-    """
+    r"""
     return a list of stems from a txt file
     """
 
@@ -264,17 +300,22 @@ def stems_from_file(filename):
 
 
 def process(data_home, datasets=None):
-    """
+    r"""
     generate metadata for all stems in the folder
 
-    arguments
-        data_home : str
-            path to folder with stems
-        dataset : list
-            if dataset is provided, we process their respective tracks first
-            using the specific information we know, such as instruments and
-            tempo.
-            supported datasets are ["brid", "musdb"]
+    Parameters
+    ----------
+    data_home : str
+        path to folder with stems
+    dataset : list
+        if dataset is provided, we process their respective tracks first
+        using the specific information we know, such as instruments and
+        tempo.
+        supported datasets are ["brid", "musdb"]
+
+    Returns
+    -------
+    None
     """
     # create a set with all stems (basename only)
     available_stems = set(
