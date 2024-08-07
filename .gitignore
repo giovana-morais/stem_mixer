@@ -10,3 +10,4 @@ docs/source/generated/
 **/*.wav
 **/*.mp3
 **/*.json
+**/*.csv
