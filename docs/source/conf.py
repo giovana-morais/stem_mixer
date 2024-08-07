@@ -19,8 +19,9 @@ import os
 sys.path.insert(0, os.path.abspath('../../stem_mixer'))
 
 extensions = [
-    "sphinx.ext.autodoc",
-    "sphinx.ext.autosummary"
+    "sphinx.ext.autodoc", # function indexing
+    "sphinx.ext.autosummary",
+    "sphinx.ext.viewcode", # get function source
 ]
 
 templates_path = ["_templates"]
