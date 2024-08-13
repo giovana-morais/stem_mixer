@@ -11,6 +11,10 @@
 # ruff
 .ruff_cache/
 
+# sphinx config
+docs/build/
+docs/source/generated/
+
 # whatever files we use and/or output
 **/*.wav
 **/*.mp3
