@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Metadata
-========
 .. autosummary::
    :toctree: generated/
 
@@ -345,6 +343,8 @@ def process(data_home, datasets=None):
         track_metadata = dict_template(data_home, tid)
         feature_extraction(os.path.join(data_home, tid), track_metadata=track_metadata)
 
+    print("Writing stems dataframe")
+    save_stem_dataframe(data_home, index_file="index.csv")
     return
 
 
@@ -369,7 +369,3 @@ if __name__ == "__main__":
         args.datasets = args.datasets.split(",")
 
     process(args.data_home, args.datasets)
-    # TODO: i'll leave them as separate functions for now, but i guess we should
-    # move this inside the process function
-    print("Writing index file")
-    save_stem_dataframe(args.data_home, index_file="index.csv")

@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Mix
-===
 .. autosummary::
    :toctree: generated/
 
@@ -263,8 +261,8 @@ def generate_mixtures(
     n_harmonic,
     n_percussive,
     duration,
-    index_file,
-    output_folder,
+    index_file="index.csv",
+    output_folder="mixtures",
 ):
     """
     Main method to generate mixtures
@@ -289,7 +287,8 @@ def generate_mixtures(
     None
     """
 
-    stems, base_tempo = select_stems(**kwargs)
+    stems, base_tempo = select_stems(n_percussive, n_harmonic, data_home,
+            index_file, base_stem=None)
     stems = time_stretch(stems, base_tempo, duration)
     stems = align_first_beat(stems)
     mixture, stems = mix(duration, stems)
