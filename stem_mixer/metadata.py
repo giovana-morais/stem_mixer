@@ -6,7 +6,7 @@ import os
 import pandas as pd
 import tqdm
 
-import features
+from stem_mixer import features
 
 DEFAULT_SR = 44100
 BRID_INDEX = "brid_index.txt"

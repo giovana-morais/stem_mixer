@@ -1,8 +1,17 @@
+# mac os
 .DS_Store
+
+# notebooks
 **/__pycache__/
 **/.ipynb_checkpoints/
+
+# local build
+*.egg-info
+
+# ruff
 .ruff_cache/
 
+# whatever files we use and/or output
 **/*.wav
 **/*.mp3
 **/*.json
