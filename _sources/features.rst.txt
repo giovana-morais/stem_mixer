@@ -1,1 +1,3 @@
-.. automodule:: features
+Features
+--------
+.. automodule:: stem_mixer.features

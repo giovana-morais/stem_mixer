@@ -1,1 +1,3 @@
-.. automodule:: mix
+Mix
+---
+.. automodule:: stem_mixer.mix
