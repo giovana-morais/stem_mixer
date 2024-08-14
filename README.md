@@ -1,27 +1,21 @@
 # stem_mixer
-Create coherent mixtures from a folder with any provided stems. The package will infer the needed metadata from the audio files and use it to create mixtures. This package currently only supports .wav audio files. 
+Create coherent mixtures from a folder with any provided stems. The package will infer the needed metadata from the audio files and use it to create mixtures. This package currently only supports .wav audio files.
 
 This package aims to increase the diversity of instruments in mixtures used to train source-separation models.
 
-# example usage - metadata creation
+# Installation
 
-SUPPORTED DATASETS FOR NON-INFERRAL METADATA CREATION:
-- [BRID (Brazilian Rhythmic Instruments Dataset)](https://www.researchgate.net/publication/331589840_A_Novel_Dataset_of_Brazilian_Rhythmic_Instruments_and_Some_Experiments_in_Computational_Rhythm_Analysis)
-- [MUSDB18*](https://sigsep.github.io/datasets/musdb.html) 
+`pip install stem_mixer`
 
-*note: if using MUSDB18, pre-pre-processing step required --> 
-- must save each stem with "vocals", "drums", "bass", "other" as prefix in .wav filename
-- i.e. Detsky Sad - Walkie Talkie - drums.wav
-- i.e. Triviul - Angelsaint - vocals.wav
-- i.e. PR - Happy Daze - bass.wav
-- i.e. Voelund - Comfort Lives In Belief - other.wav
+# Usage
 
-WHEN DATA IS INCLUDED FROM OTHER DATASETS OR SOURCES, METADATA VALUES WILL BE INFERRED
+## Metadata and Feature Extraction
+For every stem, we will calculate features and save them on a .json file.
 
-if you want to pre-process data for mixing (create json files with essential metadata), you do the following
 ```bash
-python script/preprocessing.py
+python script/metadata.py
 --data_home=<path_to_stems>
+--datasets="brid","musdb"
 ```
 
 if you want to manually call the `extraction` function to overwrite metadata:
@@ -46,22 +40,25 @@ extraction(stem_path, track_metadata=metadata, overwrite=True)
 
 to see other variables available, please run
 
-`python script/main.py --help`
+###  Supported Datasets
+While we infer features, we support some datasets for which we can infer
+features from names information.
 
-# example usage - mixture creation
+- [BRID (Brazilian Rhythmic Instruments Dataset)](https://www.researchgate.net/publication/331589840_A_Novel_Dataset_of_Brazilian_Rhythmic_Instruments_and_Some_Experiments_in_Computational_Rhythm_Analysis)
+- [MUSDB18*](https://sigsep.github.io/datasets/musdb.html)
 
-if you want to generate mixtures using supported datasets, you do the following
+*note: if using MUSDB18, pre-pre-processing step required -->
+- must save each stem with "vocals", "drums", "bass", "other" as prefix in .wav filename
+- i.e. Detsky Sad - Walkie Talkie - drums.wav
+- i.e. Triviul - Angelsaint - vocals.wav
+- i.e. PR - Happy Daze - bass.wav
+- i.e. Voelund - Comfort Lives In Belief - other.wav
 
-```bash
-python script/main.py
---data_home=<path_to_stems>
-```
 
-to see other variables available, please run
+## Mixture Creation
 
-`python script/main.py --help`
 
-# example usage - tests
+# Tests
 
 first make sure `pytest` is installed:
 ```bash
@@ -74,18 +71,8 @@ if you would like to run our implemented tests of the metadata module, first nav
 pytest ../tests/test_md.py
 ```
 
-if you would like to run our implemented tests of the preprocessing module, first navigate to your `script` folder and then do the following:
+If you would like to run our implemented tests of the preprocessing module, first navigate to your `script` folder and then do the following:
 
 ```bash
 pytest ../tests/test_pre.py
 ```
-
-# folder structure
-we expect the following folder structure:
-
-- data_home
-    - example_stem1.wav
-    - example_stem1.json
-    - example_stem2.wav
-    - example_stem2.json
-      ...
