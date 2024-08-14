@@ -1,1 +1,3 @@
 include LICENSE.md
+include stem_mixer/brid_index.txt
+include stem_mixer/musdb_index.txt

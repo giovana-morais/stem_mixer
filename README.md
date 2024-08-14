@@ -7,6 +7,11 @@ This package aims to increase the diversity of instruments in mixtures used to t
 
 `pip install stem_mixer`
 
+Our library relies on
+[python-soundfile](https://python-soundfile.readthedocs.io/en/0.11.0/) for
+writing files, which relies on
+[libsndfile](http://www.mega-nerd.com/libsndfile/).
+
 # Usage
 
 ## Metadata and Feature Extraction
