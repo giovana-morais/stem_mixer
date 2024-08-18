@@ -249,7 +249,7 @@ def mix(duration, stems, strategy="zeros"):
     for s in stems:
         # pad ending with zeros
         s["audio"] = librosa.util.fix_length(data=s["audio"], size=mixture_length)
-        mixture_audio += librosa.util.normalize(s["audio"])
+        mixture_audio += s["audio"]
 
     return mixture_audio, stems
 
@@ -291,10 +291,31 @@ def generate_mixtures(
             index_file, base_stem=None)
     stems = time_stretch(stems, base_tempo, duration)
     stems = align_first_beat(stems)
+    stems = normalize_stems(stems)
+
     mixture, stems = mix(duration, stems)
     save_mixture(output_folder, mixture, stems)
 
     return
+
+def normalize_stems(stems):
+    min_rms = np.inf
+
+    # get minimal RMS
+    for s in stems:
+        # should we move this away from here maybe?
+        # maybe calculate together with the metadata?
+        rms = np.sqrt(np.mean(s["audio"]**2))
+        # s["rms"] = np.sqrt(np.mean(s["audio"]))
+        s["rms"] = rms
+
+        if s["rms"] < min_rms:
+            min_rms = s["rms"]
+
+    for s in stems:
+        s["audio"] = s["audio"]*(min_rms/s["rms"])
+
+    return stems
 
 
 def save_mixture(output_folder, mixture, stems):
@@ -318,11 +339,15 @@ def save_mixture(output_folder, mixture, stems):
     mixture_id = str(uuid.uuid4())
     mixture_path = os.path.join(output_folder, mixture_id)
 
-    sf.write(f"{mixture_path}.wav", mixture, DEFAULT_SR)
+    os.makedirs(mixture_path)
+    sf.write(f"{mixture_path}/mixture.wav", mixture, DEFAULT_SR)
 
     for s in stems:
+        sf.write(f"{mixture_path}/{s['stem_name']}.wav", s["audio"], DEFAULT_SR)
+        # remove
         s.pop("stretched_audio", None)
         s.pop("audio", None)
+        s.pop("rms", None)
 
     with open(f"{mixture_path}.json", "w") as f:
         json.dump(stems, f)

@@ -43,7 +43,8 @@ metadata = {
 extraction(stem_path, track_metadata=metadata, overwrite=True)
 ```
 
-to see other variables available, please run
+More examples can be found in the examples folder.
+
 
 ###  Supported Datasets
 While we infer features, we support some datasets for which we can infer

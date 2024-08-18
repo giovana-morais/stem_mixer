@@ -52,14 +52,16 @@ def dict_template(data_home=None, stem_name=None):
     return metadata
 
 
-def feature_extraction(stem_path, track_metadata=None, overwrite=False):
+def feature_extraction(data_home, stem_id, track_metadata=None, overwrite=False):
     r"""
     Takes file path to a stem, calculate features and save the metadata as JSON.
 
     Parameters
     ----------
-    stem_path: str
-        Path to the audio stem file.
+    data_home: str
+        Folder where the stems are located
+    stem_id: str
+        Stem id
     metadata: dict (optional)
         dictionary with pre-computed metadata
     overwrite: boolean
@@ -70,6 +72,7 @@ def feature_extraction(stem_path, track_metadata=None, overwrite=False):
     None
     """
 
+    stem_path = os.path.join(data_home, stem_id)
     json_file_path = os.path.splitext(stem_path)[0] + ".json"
 
     if track_metadata is None:
@@ -115,7 +118,6 @@ def save_stem_dataframe(data_home, index_file="index.csv"):
     for file in json_files:
         with open(file, "r") as f:
             data.append(json.load(f))  # extracting json data
-        # print(f)
 
     df = pd.DataFrame.from_dict(data)
     df.to_csv(os.path.join(data_home, index_file), index=False)
@@ -206,7 +208,7 @@ def musdb(data_home):
 
     for tid in pbar:
         track_metadata = musdb_track_info(data_home, tid)
-        feature_extraction(os.path.join(data_home, tid), track_metadata)
+        feature_extraction(data_home, tid, track_metadata)
 
     return
 
@@ -279,7 +281,7 @@ def brid(data_home):
 
     for tid in pbar:
         track_metadata = brid_track_info(data_home, tid)
-        feature_extraction(os.path.join(data_home, tid), track_metadata)
+        feature_extraction(data_home, tid, track_metadata)
 
     return
 
@@ -341,7 +343,7 @@ def process(data_home, datasets=None):
     pbar.set_description("Processing remaining stems")
     for tid in pbar:
         track_metadata = dict_template(data_home, tid)
-        feature_extraction(os.path.join(data_home, tid), track_metadata=track_metadata)
+        feature_extraction(data_home, tid, track_metadata=track_metadata)
 
     print("Writing stems dataframe")
     save_stem_dataframe(data_home, index_file="index.csv")
