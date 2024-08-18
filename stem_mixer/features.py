@@ -13,10 +13,8 @@ import math
 import librosa
 import numpy as np
 
-DEFAULT_SR = 44100
 
-
-def tempo(stem_path):
+def tempo(stem_path, sr=22050):
     r"""
     Extracts the tempo from an audio stem file.
 
@@ -31,7 +29,7 @@ def tempo(stem_path):
         The estimated tempo of the audio file.
     """
 
-    audio_file, sr = librosa.load(stem_path, sr=DEFAULT_SR, mono=True)
+    audio_file, sr = librosa.load(stem_path, sr=sr, mono=True)
     tempo, _ = librosa.beat.beat_track(y=audio_file, sr=sr)
     tempo = float(tempo)
 
@@ -53,7 +51,7 @@ def tempo_bin(tempo):
     return math.ceil(tempo / 5) * 5
 
 
-def sound_class(stem_path):
+def sound_class(stem_path, sr=22050):
     r"""
     Extracts the sound class (harmonic / percussive) from an audio stem file.
 
@@ -69,7 +67,7 @@ def sound_class(stem_path):
         if difference between percussive / harmonic is not significant enough
     """
 
-    y, sr = librosa.load(stem_path, sr=DEFAULT_SR, mono=True)
+    y, sr = librosa.load(stem_path, sr=sr, mono=True)
     harmonic, percussive = librosa.effects.hpss(y)
 
     harmonic_energy = np.sqrt(np.mean(np.square(harmonic)))
