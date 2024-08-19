@@ -26,7 +26,12 @@ BRID_INDEX = "brid_index.txt"
 MUSDB_INDEX = "musdb_index.txt"
 
 
-def dict_template(data_home=None, stem_name=None):
+def dict_template(
+        data_home=None,
+        stem_name=None,
+        tempo=None,
+        sound_class=None,
+        key=None):
     r"""
     Create empty metadata dictionary
 

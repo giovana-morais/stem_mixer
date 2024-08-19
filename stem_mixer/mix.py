@@ -289,14 +289,14 @@ def generate_mixtures(
             index_file, base_stem=None)
     stems = time_stretch(stems, base_tempo, duration)
     stems = align_first_beat(stems)
-    stems = normalize_stems(stems)
+    stems = normalize(stems)
 
     mixture, stems = mix(duration, stems)
     save_mixture(output_folder, mixture, stems)
 
     return
 
-def normalize_stems(stems):
+def normalize(stems):
     min_rms = np.inf
 
     # get minimal RMS
