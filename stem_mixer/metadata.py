@@ -46,6 +46,7 @@ def dict_template(data_home=None, stem_name=None):
         "data_home": data_home,
         "tempo": None,
         "key": None,
+        "rms": None,
         "sound_class": None,
     }
 
@@ -86,6 +87,9 @@ def feature_extraction(data_home, stem_id, track_metadata=None, overwrite=False)
 
         if metadata["sound_class"] is None:
             metadata["sound_class"] = features.sound_class(stem_path)
+
+        if metadata["rms"] is None:
+            metadata["rms"] = features.rms(stem_path)
 
         metadata["tempo_bin"] = features.tempo_bin(metadata["tempo"])
 

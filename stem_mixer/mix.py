@@ -301,12 +301,6 @@ def normalize_stems(stems):
 
     # get minimal RMS
     for s in stems:
-        # should we move this away from here maybe?
-        # maybe calculate together with the metadata?
-        rms = np.sqrt(np.mean(s["audio"]**2))
-        # s["rms"] = np.sqrt(np.mean(s["audio"]))
-        s["rms"] = rms
-
         if s["rms"] < min_rms:
             min_rms = s["rms"]
 
@@ -342,7 +336,7 @@ def save_mixture(output_folder, mixture, stems, sr=22050):
 
     for s in stems:
         sf.write(f"{mixture_path}/{s['stem_name']}.wav", s["audio"], sr)
-        # remove
+        # remove keys we won't save
         s.pop("stretched_audio", None)
         s.pop("audio", None)
         s.pop("rms", None)

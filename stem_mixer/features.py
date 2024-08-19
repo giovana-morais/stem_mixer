@@ -87,3 +87,8 @@ def sound_class(stem_path, sr=22050):
         sound_class = "harmonic"
 
     return sound_class
+
+
+def rms(stem_path, sr=22050):
+    y, sr = librosa.load(stem_path, sr=sr, mono=True)
+    return np.sqrt(np.mean(y**2))
