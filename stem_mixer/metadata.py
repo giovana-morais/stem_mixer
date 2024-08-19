@@ -39,6 +39,10 @@ def dict_template(
     ----------
     data_home : str or None
     stem_name : str or None
+    tempo : float or None
+    sound_class : str or None
+    key : str or None
+
 
     Returns
     -------
