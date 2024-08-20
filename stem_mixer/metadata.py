@@ -143,19 +143,19 @@ def brid_track_info(data_home, tid):
     Parameters
     ----------
     data_home : str
-        folder containing stems
+       folder containing stems
     tid : str
-        track id
+       track id
 
     Returns
     -------
     tempo : float
-        tempo of stem based on style
+       tempo of stem based on style
     instrument_name : str
-        name of BRID instrument if exists
+       name of BRID instrument if exists
     key : None
     sound_class : str
-        sound_class of BRID stem, "percussive"
+       sound_class of BRID stem, "percussive"
     """
 
     track_metadata = dict_template()

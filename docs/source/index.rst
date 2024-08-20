@@ -11,10 +11,8 @@ Getting Started
    :maxdepth: 2
 
    install
-   tutorial
-   troubleshooting
    supported_datasets
-   contributing
+   demo
 
 
 API documentation
