@@ -85,16 +85,16 @@ def select_stems(
     percussive = []
     if n_percussive > 0:
         percussive_index = index_filtered[index_filtered["sound_class"] == "percussive"]
-        # if len(percussive_index) < n_percussive:
-        #     print("no percussive tracks left on this tempo bin!")
+        if len(percussive_index) < n_percussive:
+            print("no percussive tracks left on this tempo bin!")
         percussive = percussive_index.sample(n_percussive).to_dict("records")
 
     # sample harmonic stems
     harmonic = []
     if n_harmonic > 0:
         harmonic_index = index_filtered[index_filtered["sound_class"] == "harmonic"]
-        # if len(harmonic_index) < n_harmonic:
-        #     print("no harmonic tracks left on this tempo bin!")
+        if len(harmonic_index) < n_harmonic:
+            print("no harmonic tracks left on this tempo bin!")
         harmonic = harmonic_index.sample(n_harmonic).to_dict("records")
 
     # combine everything into single list
@@ -121,6 +121,10 @@ def possible_tempo_bins(index, n_harmonic, n_percussive):
     possible_tempo : list
         list with tempo_bins that have at least n_harmonic and n_percussive
         tracks
+
+    Raises
+    ------
+    ValueError
     """
 
     all_tempo_bins = index["tempo_bin"].unique()
@@ -129,7 +133,7 @@ def possible_tempo_bins(index, n_harmonic, n_percussive):
     possible_tempo = []
 
     for tempo in all_tempo_bins:
-        # hmmmm i'm not sure about this try/except blocks but i didnt find
+        # i'm not sure about this try/except blocks but i didnt find
         # anything better for now
         try:
             qty_harmonic = tempo_bin_count[(tempo, "harmonic")]
@@ -143,6 +147,9 @@ def possible_tempo_bins(index, n_harmonic, n_percussive):
 
         if qty_harmonic >= n_harmonic and qty_percussive >= n_percussive:
             possible_tempo.append(tempo)
+
+    if len(possible_tempo) == 0:
+        raise ValueError("Not enough stems to produce mixtures with the given requirementes")
 
     return possible_tempo
 
